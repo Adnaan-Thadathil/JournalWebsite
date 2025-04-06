@@ -7,18 +7,21 @@
     </head>
     <body>
         <!--Main Journal Container-->
-        <div class="journal">
+        <div class="journal" data-state="closed" aria-label="interactiveJournal">
             <!--front cover-->
-            <div class="Cover front-cover">
+            <div class="Cover front-cover" data-role="front-cover" tabindex="0">
                 <div class="coverOverlay"></div>
                 <h1 class="journalTitle">My Journal</h1>
-                <div class="spine"></div>
+                <div class="spine" data-interaction-zone aria-label="drag"></div>
             </div>
 
             <!--Page Container-->
             <div class="pages">
+                <!--page nav-->
+                <div class="pageNav">
+                    <button class="prevPage" aria-label="Previous Page"></button>
                 <!--Left Page-->
-                <div class="page layoutLeft">
+                <div class="page layoutLeft" data-page="left" data-flip-direction="backward" aria-hidden="false" data-page-number="1">
                     <div class="pageHeader">
                         <h2>Page 1</h2>
                         <div class="date">April 5th 2025</div>
@@ -28,7 +31,7 @@
                     </div>
                 </div>
 
-                <div class="page layoutRight">
+                <div class="page layoutRight" data-page="right" data-flip-direction="forward" aria-hidden="false" data-page-number="2">
                     <div class="pageHeader">
                         <h2>Page 2</h2>
                         <div class="date">April 6th 2025</div>
@@ -37,8 +40,13 @@
                     <!--content go here-->
                     </div>
                 </div>
+                <button class="nextPage" aria-label="Next Page"></button>
+                </div>
+                <div class="pageCount" aria-live="polite">
+                    Page <span data-current-page>1</span> of <span data-total-pages>10</span>
+                </div>
             <!-- Back Cover -->
-            <div class="Cover back-cover">
+            <div class="Cover back-cover" data-role="back-cover">
                 <div class="spine"></div>
             </div>
             </div>
