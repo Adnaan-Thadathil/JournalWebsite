@@ -12,6 +12,8 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     position: relative;
     perspective: 1500px;
+    transform-style: preserve-3d;
+    overflow: hidden;
 }
 /* Cover Section*/
 .Cover {
@@ -22,14 +24,19 @@ body {
     background-size: cover;
     border-radius: 2px 15px 15px 2px;
     transform-origin: left;
-    transition: transform 0.5s;
-    z-index: 10;
+    transition: transform 0.7s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    z-index: 1;
     box-shadow: inset 20px 0 50px rgba(0, 0, 0, 0.5);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
 }
 .front-cover {
     display: flex;
     justify-content: center;
     align-items: center;
+    transform-origin: left center;
+    cursor: pointer;
+    z-index: 200;
 }
 .coverOverlay {
     position: absolute;
@@ -59,6 +66,8 @@ body {
     background: linear-gradient(to right, #2c1a0d, #3d2b1f);
     box-shadow: inset -5px 0 10px rgba(0, 0, 0, 0.5);
     z-index: 1;
+    touch-action: pan-y;
+
 }
 /* page Section*/
 .pages {
@@ -71,6 +80,7 @@ body {
     overflow: hidden;
     display: flex;
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    visibility: hidden;
 }
 .page {
     width: 50%;
@@ -79,6 +89,73 @@ body {
     box-sizing: border-box;
     position: relative;
     background: #f9f4e8;
+    will-change: transform;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+
+}
+.page[aria-hidden="true"] {
+    opacity: 0;
+    pointer-events: none;
+}
+.page[aria-hidden="false"] {
+    opacity: 1;
+}
+.prevPage, .nextPage {
+    background: #3d2b1f;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 100%;
+    cursor: pointer;
+    position: relative;
+    z-index: 5;
+    transition: background 0.3s ease;
+}
+.prevPage::before, .nextPage::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    transform: translate(-50%, -50%);
+}
+.prevPage::before {
+    border-width: 10px 15px 10px 0;
+    border-color: transparent #f9f4e8 transparent transparent;
+}
+.nextPage::before {
+    border-width: 10px 0 10px 15px;
+    border-color: transparent transparent transparent #f9f4e8;
+}
+.prevPage:hover, .nextPage:hover {
+    background: #2c1a0d;
+}
+.prevPage:disabled, .nextPage:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.pageCount {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(61, 43, 31, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 0.9rem;
+}
+[data-interaction-zone] {
+    cursor: pointer;
+}
+[data-interaction-zone]:hover {
+    box-shadow: inset -5px 0 10px rgba(0, 0, 0, 0.7);
+}
+.journal[data-state="open"] .front-cover {
+    transform: rotateY(-160deg);
 }
 .layoutLeft {
     border-right: 1px solid #e0d5c0;
@@ -104,5 +181,24 @@ body {
 }
 .back-cover {
     background: linear-gradient(to right, #3d2b1f, #2c1a0d);
-    z-index: 1;
+    z-index: -1;
+    border-radius: 15px 0 0 15px;
+    box-shadow: inset -20px 0 50px rgba(0, 0, 0, 0.5);
+}
+.back-cover.visible {
+    z-index: 100;
+}
+
+.page.flipping {
+    transition: transform 0.6s ease;
+    transform-origin: left center;
+}
+[data-flip-direction="forward"] {
+    transform: rotateY(-180deg);
+}
+[data-flip-direction="backward"] {
+    transform: rotateY(180deg);
+}
+.journal[data-state="open"] .pages {
+    visibility: visible;
 }
