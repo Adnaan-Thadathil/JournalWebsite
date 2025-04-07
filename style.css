@@ -37,6 +37,7 @@ body {
     transform-origin: left center;
     cursor: pointer;
     z-index: 200;
+    transition: transform 0.7s ease cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 .coverOverlay {
     position: absolute;
