@@ -1,0 +1,23 @@
+{
+    "Cover": {
+        "title": [],
+        "author": [],
+        "created": [],
+        "lastEdited": []
+    },
+    "Pages": {
+        "1": {
+            "Title": [],
+            "Date": [],
+            "Content": [],
+            "lastChanged": []
+        },
+        "2": {
+            "Title": [],
+            "Date": [],
+            "Content": [],
+            "lastChanged": []
+        }
+    }
+
+}

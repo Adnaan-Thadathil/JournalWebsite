@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const spine = document.querySelector('[data-interaction-zone]');
     
     let currentPage = 1;
+    let isCoverOn = true; // tracks if the cover is on or off
     const totalPages = 10;
     let isOpen = false;
     
@@ -29,7 +30,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     spine.addEventListener('click', function() {
-        if (isOpen) {
+        if (isOpen && !isCoverOn) {
+            showCover();
+        } else if (isOpen) {
             closeJournal();
         }
     });
@@ -52,7 +55,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Keyboard navigation
     document.addEventListener('keydown', function(e) {
         if (!isOpen) return;
-        
+        if (e.key === 'Escape') {
+            if (isCoverOn) {
+                closeJournal();
+            } else {
+                showCover();
+            }
+        }
         if (e.key === 'ArrowRight' && currentPage < totalPages) {
             currentPage++;
             updatePageDisplay();
@@ -66,14 +75,21 @@ document.addEventListener('DOMContentLoaded', function() {
         journal.setAttribute('data-state', 'open');
         frontCover.style.transform = 'rotateY(-160deg)';
         isOpen = true;
+        isCoverOn = false;
         // Show pages container
         pagesContainer.style.visibility = 'visible';
+    }
+    function showCover() {
+        isCoverOn = true;
+        pagesContainer.style.visibility = 'hidden';
+        frontCover.style.transform = 'rotateY(0deg)';
     }
     
     function closeJournal() {
         journal.setAttribute('data-state', 'closed');
         frontCover.style.transform = 'rotateY(0deg)';
         isOpen = false;
+        isCoverOn = true;
         // Hide pages container when closed
         pagesContainer.style.visibility = 'hidden';
         // Reset to first page when closing
