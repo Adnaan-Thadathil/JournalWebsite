@@ -17,41 +17,36 @@
 
             <!--Page Container-->
             <div class="pages">
+                <div class ="page-header pageElement">
+                    <h2 class="header-title"></h2>
+                    <h3 class="header-date"></h3>
+                    <button class="edit-btn">Edit</button>
+                    <button class="save-btn">Save</button>
+                </div>
+                <div class="page-content pageElement">
+                    <div class="edit-area">
+                        <textarea class="content-editor"></textarea>
+                        <input type="text" class="title-editor" value="test">
+                        <input type="text" class="date-editor" value="test">
+                        <button class="save-btn">Save</button>
+                        <button class="delete-btn">Delete</button>
+                        <button class="add-btn">Add</button>
+                    </div>
+                </div>
                 <!--page nav-->
                 <div class="pageNav">
                     <button class="prevPage" aria-label="Previous Page"></button>
-                <!--Left Page-->
-                <div class="page layoutLeft" data-page="left" data-flip-direction="backward" aria-hidden="false" data-page-number="1">
-                    <div class="pageHeader">
-                        <h2>Page 1</h2>
-                        <div class="date">April 5th 2025</div>
-                    </div>
-                    <div class="pageContent" setcontentEditable="true" data-pageID>
-                    <!--content go here-->
-                    </div>
-                </div>
-
-                <div class="page layoutRight" data-page="right" data-flip-direction="forward" aria-hidden="false" data-page-number="2">
-                    <div class="pageHeader">
-                        <h2>Page 2</h2>
-                        <div class="date">April 6th 2025</div>
-                    </div>
-                    <div class="pageContent">
-                    <!--content go here-->
-                    </div>
-                </div>
-                <button class="nextPage" aria-label="Next Page"></button>
+                    <button class="nextPage" aria-label="Next Page"></button>
                 </div>
                 <div class="pageCount" aria-live="polite">
                     Page <span data-current-page>1</span> of <span data-total-pages>10</span>
                 </div>
             <!-- Back Cover -->
-            <div class="Cover back-cover" data-role="back-cover">
-                <div class="spine"></div>
-            </div>
+                <div class="Cover back-cover" data-role="back-cover">
+                    <div class="spine"></div>
+                </div>
             </div>
         </div>
     <script src="script.js"></script>
-    <script src="page.js"></script>
     </body>
 </html>
