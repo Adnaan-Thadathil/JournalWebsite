@@ -5,19 +5,31 @@
         "created": [],
         "lastEdited": []
     },
-    "Pages": {
-        "1": {
-            "Title": [],
-            "Date": [],
-            "Content": [],
-            "lastChanged": []
-        },
-        "2": {
-            "Title": [],
-            "Date": [],
-            "Content": [],
-            "lastChanged": []
-        }
-    }
+    "page": [
+      {
+        "id": 1,
+        "Title": [],
+        "Date": [],
+        "Content": []
+      },
+      {
+        "id": 2,
+        "Title": [],
+        "Date": [],
+        "Content": []
+      },
+      {
+        "id": 3,
+        "Title": [],
+        "Date": [],
+        "Content": []
+      },
+      {
+        "id": 4,
+        "Title": [],
+        "Date": [],
+        "Content": []
+      }
+    ]
 
 }
