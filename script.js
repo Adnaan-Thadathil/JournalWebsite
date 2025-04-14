@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     const journal = document.querySelector('.journal');
     const frontCover = document.querySelector('.front-cover');
     const backCover = document.querySelector('.back-cover');
@@ -8,14 +8,45 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPageSpan = document.querySelector('[data-current-page]');
     let totalPagesSpan = document.querySelector('[data-total-pages]');
     const spine = document.querySelector('[data-interaction-zone]');
-    
-    let currentPage = 1;
-    let isCoverOn = true; // tracks if the cover is on or off
-    let totalPages = 20; // total number of pages
+    let pageDataPages = [];
+    let currentPage = 0;
+    let isCoverOn = true;
+    let totalPages = 0;
     let isOpen = false;
+    // json and local storage loading data
+    
+        // try to load from localStorage
+        let pageData;
+        try {
+            pageData = JSON.parse(localStorage.getItem('pageData'));
+        } catch (error) {
+            console.error('Error parsing localStorage data:', error);
+            pageData = null;
+        }
+        // if no localStroage data, load from json
+        if (!pageData) {
+            try {
+                const response = await fetch('diaryLayout.json');
+                pageData = await response.json();
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                pageDataPages = pageData.page || [];
+                localStorage.setItem('pageData', JSON.stringify(pageDataPages));
+            } catch (error) {
+                console.error('Error loading JSON:', error);
+                pageDataPages = [];
+            }
+        } else {
+            pageDataPages = pageData;
+        }
+        renderPages(pageDataPages);
+
+    totalPages = pageDataPages.length;
+    totalPagesSpan.textContent = totalPages;
+    currentPageSpan.textContent = currentPage;
     
     // Initialize
-    totalPagesSpan.textContent = totalPages;
     updatePageDisplay();
     
     // Position back cover behind everything
@@ -78,9 +109,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show pages container
         pagesContainer.style.visibility = 'visible';
     }
-    function updateTotalPages() {
-        totalPages = allPages.length;
-    }
     function showCover() {
         isCoverOn = true;
         pagesContainer.style.visibility = 'hidden';
@@ -116,27 +144,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initially hide pages container
     pagesContainer.style.visibility = 'hidden';
-    // json and local storage loading data
-    document.addEventListener('DOMContentLoaded', async function() {
-        // try to load from localStorage
-        let pageData = JSON.parse(localStorage.getItem('pageData'));
-        // if no localStroage data, load from json
-        if (!pageData) {
-            try {
-                const response = await fetch('diaryLayout.json');
-                pageData = await response.json();
-                pageDataPages = pageData.page;
-                localStorage.setItem('pageData', JSON.stringify(pageDataPages));
-            } catch (error) {
-                console.error('Error loading JSON:', error);
-                pageDataPages = [];
-            }
-        }
-
-        renderPages(pageDataPages);
-    });
+    
     
     function renderPages(pages) {
+        console.log('Rendering pages:', pages);
+        let pageElement;
+        pagesContainer.innerHTML = ''; // Clear existing pages
         pages.forEach(page => {
             const pageElement = document.createElement('div');
             pageElement.className = 'page';
@@ -151,19 +164,20 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="page-content pageElement">${escapeHtml(page.content)}</div>
             <div class="edit-area" style="display: none;">
-                <textarea class="content-editor">${escapeHtml(page.content)}</textarea>
                 <input type="text" class="title-editor" value="${escapeHtml(page.Title)}">
                 <input type="text" class="date-editor" value="${escapeHtml(page.Date)}">
+                <textarea class="content-editor">${escapeHtml(page.content)}</textarea>
                 <button class="save-btn">Save</button>
                 <button class="delete-btn">Delete</button>
                 <button class="add-btn">Add</button>
             </div>
             `;
             pagesContainer.appendChild(pageElement);
-            setupPageEvents(pageElement, page, pages);       
+            setupPageEvents(pageElement, page, pages);   
+            /*pagesContainer.insertBefore(pageElement, nextPageBtn);    */
         });
 
-        function setupPageEvents(element, page, allPages) {
+        function setupPageEvents(element, aPage, allPages) {
             const editBtn = element.querySelector('.edit-btn');
             const saveBtn = element.querySelector('.save-btn');
             const deleteBtn = element.querySelector('.delete-btn');
@@ -177,6 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let contentDisplay = element.querySelector('.page-content');
             
             editBtn.addEventListener('click', () => {
+                console.log('editing page:', aPage);
                 headingTitle.style.display = 'none';
                 headingDate.style.display = 'none';
                 contentDisplay.style.display = 'none';
@@ -189,23 +204,24 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             saveBtn.addEventListener('click', () => {
+                console.log('saving page:', aPage);
                 const newTitle = titleEditor.value.trim();
                 const newDate = dateEditor.value.trim();
                 const newContent = contentEditor.value.trim();
                 if (newTitle) {
-                    page.Title = newTitle;
+                    aPage.Title = newTitle;
                     headingTitle.textContent = newTitle;
                     headingTitle.style.display = 'block';
                     console.log('Title updated:', newTitle);
                 }
                 if (newDate) {
-                    page.Date = newDate;
+                    aPage.Date = newDate;
                     headingDate.textContent = newDate;
                     headingDate.style.display = 'block';
                     console.log('Date updated:', newDate);
                 }
                 if (newContent) {
-                    page.content = newContent;
+                    aPage.content = newContent;
                     contentDisplay.textContent = newContent;
                     contentDisplay.style.display = 'block';
                     console.log('Content updated:', newContent);
@@ -217,7 +233,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             deleteBtn.addEventListener('click', () => {
-                const pageId = page.id;
+                console.log('deleting page:', aPage);
+                const pageId = aPage.id;
                 const index = allPages.findIndex(p => p.id === pageId);
                 if (index !== -1) {
                     allPages.splice(index, 1);
@@ -226,20 +243,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     element.remove();
                 }
             });
+            console.log(aPage);
             addBtn.addEventListener('click', () => {
-                const pageId = page.id;
+                console.log('adding page:', aPage);
+                const pageId = aPage.id;
                 const index = allPages.findIndex(p => p.id === pageId);
                 if (index !== -1) {
-                       if (index == allPages.length - 1) {
-                        const newPage = {
-                            id: pageId,
-                            Title: '',
-                            Date: '',
-                            content: ''
-                            };
-                        }
-                        allPages.push(newPage);
-                    allPages.splice(index + 1, 0, newPage);
+                    const newPage = {
+                        id: pageId,
+                        Title: '',
+                        Date: '',
+                        content: ''
+                    };
+                    allPages.push(newPage);
                     updateTotalPages();
                     localStorage.setItem('pageData', JSON.stringify(allPages));
                     renderPages(allPages);
@@ -247,11 +263,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
             });
+            function updateTotalPages() {
+                totalPages = allPages.length;
+            }
             
             
         }
-        pagesContainer.insertBefore(page, nextPageBtn);
         
+        
+        function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') {
+                return unsafe;
+            }
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
     }
     
     
