@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     let currentPageSpan = document.querySelector('[data-current-page]');
     let totalPagesSpan = document.querySelector('[data-total-pages]');
     const spine = document.querySelector('[data-interaction-zone]');
+    const pageCount = document.querySelector('.pageCount');
     let pageDataPages = [];
     let currentPage = 0;
     let isCoverOn = true;
@@ -24,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             pageData = null;
         }
         // if no localStroage data, load from json
-        if (!pageData) {
+        if (!pageData || pageData.length === 0) {
             try {
                 const response = await fetch('diaryLayout.json');
                 pageData = await response.json();
@@ -133,6 +134,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Update button states
         prevPageBtn.disabled = currentPage === 1;
         nextPageBtn.disabled = currentPage === totalPages;
+        pageCount.style.zIndex = '99'
         
         // Show back cover when on last page
         if (currentPage === totalPages) {
@@ -149,10 +151,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     function renderPages(pages) {
         console.log('Rendering pages:', pages);
         let pageElement;
-        pagesContainer.innerHTML = ''; // Clear existing pages
+        const pagesContainer = document.querySelector('.pages');
+        /*pagesContainer.innerHTML = '';*/
         pages.forEach(page => {
             const pageElement = document.createElement('div');
-            pageElement.className = 'page';
+            pageElement.classList.add('page');
             pageElement.dataset.pageId = page.id;
             
             pageElement.innerHTML = `
@@ -167,14 +170,19 @@ document.addEventListener('DOMContentLoaded', async function() {
                 <input type="text" class="title-editor" value="${escapeHtml(page.Title)}">
                 <input type="text" class="date-editor" value="${escapeHtml(page.Date)}">
                 <textarea class="content-editor">${escapeHtml(page.content)}</textarea>
-                <button class="save-btn">Save</button>
+                <button class="save-btn" style="display: none;">Save</button>
                 <button class="delete-btn">Delete</button>
                 <button class="add-btn">Add</button>
             </div>
             `;
             pagesContainer.appendChild(pageElement);
-            setupPageEvents(pageElement, page, pages);   
-            /*pagesContainer.insertBefore(pageElement, nextPageBtn);    */
+            setupPageEvents(pageElement, page, pages);
+            if (prevPageBtn && !pagesContainer.contains(prevPageBtn)) {
+                pagesContainer.appendChild(prevPageBtn);
+            }
+            if (nextPageBtn && !pagesContainer.contains(nextPageBtn)) {
+                pagesContainer.appendChild(nextPageBtn);
+            }   
         });
 
         function setupPageEvents(element, aPage, allPages) {
@@ -234,8 +242,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             
             deleteBtn.addEventListener('click', () => {
                 console.log('deleting page:', aPage);
-                const pageId = aPage.id;
-                const index = allPages.findIndex(p => p.id === pageId);
+                var pageId = aPage.id;
+                var index = allPages.findIndex(p => p.id === pageId);
                 if (index !== -1) {
                     allPages.splice(index, 1);
                     updateTotalPages();
@@ -246,11 +254,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             console.log(aPage);
             addBtn.addEventListener('click', () => {
                 console.log('adding page:', aPage);
-                const pageId = aPage.id;
-                const index = allPages.findIndex(p => p.id === pageId);
+                var pageId = aPage.id;
+                var index = allPages.findIndex(p => p.id === pageId);
                 if (index !== -1) {
                     const newPage = {
-                        id: pageId,
+                        id: pageId++,
                         Title: '',
                         Date: '',
                         content: ''
