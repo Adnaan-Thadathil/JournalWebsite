@@ -76,6 +76,7 @@ body {
     width: calc(100% - 40px);
     height: 100%;
     left: 40px;
+    top: 0;
     background: #fffdf8;
     background-image: linear-gradient(to bottom, #fffdf8 0%, #f9f4e8 100%);
     background-size: 100% 100%;
@@ -169,6 +170,7 @@ body {
     background-color: #f8f1e5;
     border-bottom: 2px solid #d4c9b8;
     align-items: center;
+    position: absolute;
 }
 
 .header-title {
@@ -257,6 +259,7 @@ button:hover {
     line-height: 1.6;
     color: #3d2b1f;
     white-space: pre-wrap;
+    position: absolute;
 }
 
 .content-editor {

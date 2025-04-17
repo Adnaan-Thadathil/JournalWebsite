@@ -73,6 +73,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (currentPage < totalPages) {
             currentPage++;
             updatePageDisplay();
+            console.log(currentPage);
         }
     });
     
@@ -130,6 +131,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     function updatePageDisplay() {
         currentPageSpan.textContent = currentPage;
+        pageHider();
         
         // Update button states
         prevPageBtn.disabled = currentPage === 1;
@@ -138,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         // Show back cover when on last page
         if (currentPage === totalPages) {
-            backCover.style.zIndex = '100';
+            backCover.style.zIndex = totalPages + 1;
         } else {
             backCover.style.zIndex = '-1';
         }
@@ -159,6 +161,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             pageElement.dataset.pageId = page.id;
             
             pageElement.innerHTML = `
+            <div class="page-number">
             <div class ="page-header pageElement">
                 <h2 class="header-title">${escapeHtml(page.Title)}</h2>
                 <h3 class="header-date">${escapeHtml(page.Date)}</h3>
@@ -174,8 +177,11 @@ document.addEventListener('DOMContentLoaded', async function() {
                 <button class="delete-btn">Delete</button>
                 <button class="add-btn">Add</button>
             </div>
+            </div>
             `;
             pagesContainer.appendChild(pageElement);
+            const pageChecker = pagesContainer.querySelectorAll('.page-number');
+            pageHider();  
             setupPageEvents(pageElement, page, pages);
             if (prevPageBtn && !pagesContainer.contains(prevPageBtn)) {
                 pagesContainer.appendChild(prevPageBtn);
@@ -244,11 +250,14 @@ document.addEventListener('DOMContentLoaded', async function() {
                 console.log('deleting page:', aPage);
                 var pageId = aPage.id;
                 var index = allPages.findIndex(p => p.id === pageId);
-                if (index !== -1) {
-                    allPages.splice(index, 1);
-                    updateTotalPages();
-                    localStorage.setItem('pageData', JSON.stringify(allPages));
-                    element.remove();
+                for (let i = index; i < allPages.length; i++) {
+                    if (allPages[i].id === pageId) {
+                        allPages.splice(i, 1);
+                        updateTotalPages();
+                        localStorage.setItem('pageData', JSON.stringify(allPages));
+                        element.remove();
+                        renderPages(allPages);
+                    }
                 }
             });
             console.log(aPage);
@@ -256,7 +265,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 console.log('adding page:', aPage);
                 var pageId = aPage.id;
                 var index = allPages.findIndex(p => p.id === pageId);
-                if (index !== -1) {
+                for (let i = index; i < allPages.length; i++) {
                     const newPage = {
                         id: pageId++,
                         Title: '',
@@ -289,6 +298,23 @@ document.addEventListener('DOMContentLoaded', async function() {
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
+        }
+    }
+    function pageHider() {
+        const pageChecker = pagesContainer.querySelectorAll('.page-number'); // Use querySelectorAll
+        const pageID = pagesContainer.querySelectorAll('[data-page-id]'); // Use querySelectorAll
+    
+        for (let i = 0; i < pageChecker.length; i++) {
+            pageChecker[i].style.zIndex = i + 1;
+    
+            console.log('Current Page:', currentPage);
+            console.log('Page ID:', pageID[i].dataset.pageId);
+    
+            if (pageID[i].dataset.pageId === String(currentPage)) { // Compare with currentPage
+                pageChecker[i].style.visibility = 'visible';
+            } else {
+                pageChecker[i].style.visibility = 'hidden';
+            }
         }
     }
     
